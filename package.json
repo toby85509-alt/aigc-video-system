@@ -1,0 +1,19 @@
+{
+  "name": "aigc-video-system",
+  "version": "1.0.0",
+  "private": true,
+  "description": "电商场景AIGC带货视频生成系统",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "build": "cd client && npm run build && cd ../server && npm run build",
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0"
+  },
+  "dependencies": {
+    "adm-zip": "^0.5.17"
+  }
+}
