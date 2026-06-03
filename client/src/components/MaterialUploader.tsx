@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import { materialsApi } from '../api/client';
+import { useToast } from '../context/AppContext';
 
 interface Props {
   onSuccess: () => void;
@@ -7,6 +8,7 @@ interface Props {
 }
 
 export default function MaterialUploader({ onSuccess, onClose }: Props) {
+  const toast = useToast();
   const [files, setFiles] = useState<File[]>([]);
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('');
@@ -38,8 +40,9 @@ export default function MaterialUploader({ onSuccess, onClose }: Props) {
     try {
       await materialsApi.upload(formData);
       onSuccess();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : '上传失败，请重试';
+      toast(message, 'error');
     } finally {
       setUploading(false);
     }

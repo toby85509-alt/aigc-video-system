@@ -39,9 +39,16 @@ export interface ProductInfo {
 export interface Storyboard {
   id: string;
   productId: string;
+  productInfo?: ProductInfo;
   title: string;
   strategy: string;        // 创作策略
   factors: CreativeFactor; // 创作因子
+  templateId?: string;
+  methodology?: ScriptMethodology;
+  referenceAnalyses?: ReferenceAnalysis[];
+  qualityScore?: number;
+  qualityChecklist?: QualityChecklistItem[];
+  creativeTags?: string[];
   narrative: string;       // 叙事框架
   visualStyle: string;
   shots: Shot[];
@@ -57,6 +64,34 @@ export interface CreativeFactor {
   visualFocus: string;
   narration: string;
   pacing: string;
+}
+
+export interface ScriptMethodology {
+  source: 'inspiration_template' | 'hot_video_remix' | 'auto_composition';
+  structure: string;
+  hookTechnique: string;
+  proofTechnique: string;
+  conversionTechnique: string;
+  riskControl: string;
+}
+
+export interface ReferenceAnalysis {
+  id: string;
+  title: string;
+  category: string;
+  platform: string;
+  sourceType: 'public_pattern' | 'merchant_upload' | 'mock_research';
+  hook: string;
+  sellingPointAngle: string;
+  shotPattern: string[];
+  styleFactors: string[];
+  sourceDeclaration: string;
+}
+
+export interface QualityChecklistItem {
+  item: string;
+  passed: boolean;
+  evidence: string;
 }
 
 export interface Shot {

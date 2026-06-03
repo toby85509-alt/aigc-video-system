@@ -39,8 +39,11 @@ router.post('/', async (req: Request, res: Response) => {
           taskService.updateStep(task.id, '合成视频', 'completed');
           taskService.updateStep(task.id, '添加配音和字幕', 'completed');
           taskService.updateStep(task.id, '导出视频', 'completed');
+        } else if (p?.status === 'failed') {
+          taskService.failTask(task.id, p.error || '视频生成失败');
         }
       } else {
+        taskService.updateStep(task.id, '准备素材', 'completed');
         taskService.updateStep(task.id, '渲染分镜', 'running');
       }
     }, 1000);

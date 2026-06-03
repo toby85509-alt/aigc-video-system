@@ -12,6 +12,7 @@ interface ShotData {
   subtitle?: string;
   transition?: string;
   bgm?: string;
+  videoUrl?: string;
 }
 
 interface Props {
@@ -355,6 +356,47 @@ export default function VideoPreview({ projectId, status, progress, outputUrl, s
 
   const completedShots = shots.filter((s) => s.status === 'completed').length;
   const totalShots = shots.length;
+  const finalVideoUrl = status === 'completed' && outputUrl
+    ? `${outputUrl}${outputUrl.includes('?') ? '&' : '?'}v=${encodeURIComponent(projectId)}`
+    : '';
+
+  if (finalVideoUrl) {
+    return (
+      <div className="card">
+        <div className="flex justify-between items-center mb-4">
+          <h3 style={{ fontSize: 15, fontWeight: 600 }}>视频预览</h3>
+          <span className="tag tag-green">最终成片</span>
+        </div>
+
+        <div style={{
+          width: '100%',
+          maxWidth: canvasWidth,
+          margin: '0 auto',
+          aspectRatio: aspectRatio === '9:16' ? '9/16' : '16/9',
+          background: '#000',
+          borderRadius: 8,
+          overflow: 'hidden',
+        }}>
+          <video
+            key={finalVideoUrl}
+            src={finalVideoUrl}
+            controls
+            playsInline
+            preload="metadata"
+            style={{ width: '100%', height: '100%', display: 'block', objectFit: 'contain', background: '#000' }}
+          />
+        </div>
+
+        <div className="progress-bar" style={{ marginTop: 12, marginBottom: 8 }}>
+          <div className="progress-fill success" style={{ width: '100%' }} />
+        </div>
+        <div className="flex justify-between text-sm text-secondary">
+          <span>分镜: {completedShots}/{totalShots}</span>
+          <a href={finalVideoUrl} target="_blank" rel="noreferrer">打开最终成片</a>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="card">
@@ -404,7 +446,7 @@ export default function VideoPreview({ projectId, status, progress, outputUrl, s
       </div>
       <div className="flex justify-between text-sm text-secondary">
         <span>分镜: {completedShots}/{totalShots}</span>
-        {status === 'completed' && <span>{currentTime.toFixed(1)}s / {duration.toFixed(1)}s</span>}
+        <span>总时长: {duration.toFixed(1)}s</span>
         {imageError && <span style={{ color: '#ef4444' }}>图片未加载</span>}
         {productImageUrl && !imageLoaded && !imageError && <span>图片加载中...</span>}
       </div>

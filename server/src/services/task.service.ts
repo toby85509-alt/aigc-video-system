@@ -32,6 +32,7 @@ export const taskService = {
     const step = task.steps.find((s) => s.name === stepName);
     if (!step) return;
     step.status = status;
+    if (status === 'running') task.status = 'running';
     step.completedAt = status === 'completed' ? new Date().toISOString() : undefined;
     if (detail) step.detail = detail;
     task.progress = Math.round(
@@ -49,6 +50,7 @@ export const taskService = {
     if (!task) return;
     task.status = 'failed';
     task.error = error;
+    task.completedAt = new Date().toISOString();
     save();
   },
 

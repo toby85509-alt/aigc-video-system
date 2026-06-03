@@ -1,0 +1,36 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  lint-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm run install:all
+
+      - name: Lint
+        run: |
+          npx eslint . --ext .ts,.tsx --max-warnings 50 || true
+
+      - name: Type check server
+        run: cd server && npx tsc --noEmit
+
+      - name: Type check client
+        run: cd client && npx tsc --noEmit
+
+      - name: Build
+        run: npm run build

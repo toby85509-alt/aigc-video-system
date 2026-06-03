@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { scriptService } from '../services/script.service';
 import { taskService } from '../services/task.service';
+import { traceService } from '../services/trace.service';
 import { firstParam, requiredParam } from './params';
 
 const router = Router();
@@ -25,7 +26,23 @@ router.post('/generate', async (req: Request, res: Response) => {
     taskService.updateStep(task.id, '分析商品信息', 'running');
     setTimeout(() => taskService.updateStep(task.id, '分析商品信息', 'completed'), 500);
 
+    const startedAt = Date.now();
     const storyboard = await scriptService.generate(productInfo, templateId, referenceStyle);
+    const fallbackConstraint = storyboard.constraints.find((item) => item.includes('模型降级说明'));
+    traceService.record({
+      type: 'script_generation',
+      status: 'success',
+      productTitle: productInfo.title,
+      category: productInfo.category,
+      templateId,
+      modelEndpoint: process.env.VOLCANO_TEXT_EP || 'doubao-seed-2.0-pro',
+      durationMs: Date.now() - startedAt,
+      qualityScore: storyboard.qualityScore,
+      fallbackUsed: Boolean(fallbackConstraint),
+      fallbackReason: fallbackConstraint,
+      promptSummary: `${storyboard.methodology?.structure || 'Hook-Demo-Proof-CTA'} | ${referenceStyle || 'no extra prompt'}`,
+      outputId: storyboard.id,
+    });
 
     taskService.updateStep(task.id, '匹配创作策略', 'completed');
     taskService.updateStep(task.id, '生成叙事框架', 'completed');
@@ -35,6 +52,16 @@ router.post('/generate', async (req: Request, res: Response) => {
 
     res.json({ data: storyboard, taskId: task.id });
   } catch (err: any) {
+    traceService.record({
+      type: 'script_generation',
+      status: 'failed',
+      productTitle: req.body?.productInfo?.title,
+      category: req.body?.productInfo?.category,
+      templateId: req.body?.templateId,
+      modelEndpoint: process.env.VOLCANO_TEXT_EP || 'doubao-seed-2.0-pro',
+      durationMs: 0,
+      error: err.message,
+    });
     res.status(500).json({ error: err.message });
   }
 });

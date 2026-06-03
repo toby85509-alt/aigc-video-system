@@ -11,9 +11,14 @@ dist/
 
 uploads/materials/*
 uploads/outputs/*
+uploads/docx_qa/
+uploads/screenshots/
+uploads/temp/
+uploads/*.json
 !uploads/materials/.gitkeep
 !uploads/outputs/.gitkeep
 server/uploads/
+tools/
 
 *.log
 npm-debug.log*
